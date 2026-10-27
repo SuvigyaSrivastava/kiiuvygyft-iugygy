@@ -112,3 +112,9 @@ def test_receipt_json_and_csv_match(client):
 
 def test_admin_refresh_is_off_by_default(client):
     assert client.post("/api/admin/refresh").status_code == 404
+
+
+def test_vercel_entry_point_exposes_the_same_app():
+    from api.index import app as vercel_app
+
+    assert vercel_app is app

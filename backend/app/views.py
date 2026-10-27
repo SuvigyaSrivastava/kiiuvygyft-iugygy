@@ -14,8 +14,16 @@ from .engine import Engine, Scope, Spec
 
 SIGN = "error = forecast - actual (MW). Positive means over-forecast, which leaves the buyer short."
 GATE_SOURCES = [
-    {"name": "EPEX SPOT GB day-ahead auction", "note": "gate closure listed as 10:20 CET/CEST, which is 09:20 UK time"},
-    {"name": "Nord Pool N2EX day-ahead auction", "note": "gate closure listed as 09:50 GMT"},
+    {
+        "name": "EPEX SPOT GB day-ahead auction",
+        "note": "moved from 11:00 GMT to 09:20 GMT from 1 January 2021 (10:20 CET)",
+        "url": "https://epexspot.com/en/news/exchange-council-welcomes-new-timing-gb-day-ahead-auction",
+    },
+    {
+        "name": "Nord Pool N2EX day-ahead auction",
+        "note": "gate closure 09:50 GMT, which Nord Pool also gives as 10:50 CET",
+        "url": "https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-day-ahead-gb-auction",
+    },
 ]
 CAVEATS = [
     "FUELHH is metered output after curtailment. Wind farms paid to turn down appear as forecast error even when the forecast was right.",
