@@ -3,15 +3,9 @@
   "outputDirectory": "frontend/dist",
   "functions": {
     "api/index.py": {
-      "includeFiles": "{backend,data}/**",
-      "excludeFiles": "{frontend,tests,docs,scripts,node_modules}/**",
+      "includeFiles": "{backend,data,frontend/dist}/**",
+      "excludeFiles": "{tests,docs,scripts,node_modules,frontend/src,frontend/node_modules}/**",
       "maxDuration": 30
     }
-  },
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "/api/index.py"
-    }
-  ]
+  }
 }
