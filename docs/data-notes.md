@@ -34,8 +34,7 @@ The sensitivity result is therefore binary: which side of 09:30 the cutoff falls
 ## Hourly to half-hourly rule
 Default: the hourly value at T is applied to both half-hours it covers (T:00 and T:30). Linear interpolation between T and T+1h is offered as a labelled alternative. I assume the value at `startTime` T describes the hour starting at T; I could not confirm that from the docs, so the README states it as an assumption.
 
-## Still to verify before the build is final
-- Gate closure time: EPEX GB day-ahead (10:20 CET, 09:20 UK) and Nord Pool N2EX (09:50 GMT) per the build prompt. Confirm against current exchange documentation and link it in the README.
+## Open caveat
 - Curtailment and farm coverage differences between FUELHH and WINDFOR cannot be separated with the allowed data. Stated as a caveat only.
 
 ## Added after the build
