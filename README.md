@@ -63,6 +63,36 @@ docs/                  decisions, data notes, video scripts, run sheet, submissi
 Dockerfile, docker-compose.yml, vercel.json, .github/workflows/ci.yml
 ```
 
+## Architecture
+
+```mermaid
+flowchart LR
+    U[Browser<br/>React, TypeScript, ECharts] -->|GET /api/...| A[FastAPI<br/>validates input, returns typed JSON]
+    A --> V[views and engine<br/>join data to rules, cache results]
+    V --> D[domain<br/>selection, metrics, bands, receipt<br/>pure functions, no I/O]
+    V --> S[(Snapshot<br/>data/raw, committed<br/>Elexon FUELHH and WINDFOR)]
+    F[scripts/fetch_data.py<br/>run by hand] -.->|rewrites| S
+    E[Elexon BMRS API] -.-> F
+```
+
+How a request flows, in five steps:
+
+1. The page asks for one delivery day and the settings (cutoff, cost ratio). The settings live in the URL, so any view can be shared as a link.
+2. FastAPI checks the inputs and rejects bad ones with a plain message.
+3. The engine picks, for each half-hour, the newest forecast published at or before the cutoff. A guard raises an error if a later forecast ever slips in.
+4. Error bands and extra cover are built only from days that were fully finished before the decision time (walk-forward), so there is no peeking at the future.
+5. The response goes back as typed JSON, and the page draws it. A receipt with a SHA-256 of the input rows lets anyone re-check the decision.
+
+Why it is built this way:
+
+| Choice | Reason |
+|---|---|
+| Data snapshot committed to the repo | The numbers reproduce exactly, with no API key and no rate limits. The running app never calls Elexon. |
+| Domain code is pure functions | The leakage rule and the sign convention are tested in one place, with no network or files involved. |
+| One FastAPI app serves the API and the built page | One deploy, one origin, no CORS surprises. The same app runs in Docker and as a Vercel function. |
+| Results cached per setting | Moving between days and views is instant after the first load. |
+| Receipt for every decision | A reviewer can verify which forecast rows were used without trusting the UI. |
+
 ## How forecast selection works
 
 WINDFOR publishes a new forecast eight times a day (02:30, 04:30, 07:30, 09:30, 11:30, 15:30, 18:30 and 22:30, London time in January), each covering the next three days or so. A purchase for delivery day D+1 is made on day D before the auction closes. The forecast you can use is the one with the latest `publishTime` at or before that cutoff.
