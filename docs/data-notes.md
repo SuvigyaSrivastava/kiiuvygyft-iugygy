@@ -1,6 +1,6 @@
 # Data notes (Step 0 findings)
 
-Fetched 27 Oct 2026 from the Elexon Insights API. Every figure below came from a real pull; see `data/raw/manifest.json` for URLs, row counts and hashes.
+Fetched 27 Oct 2026 from the Elexon Insights API (snapshot id in `data/raw/manifest.json`). Every figure below came from a real pull; see `data/raw/manifest.json` for URLs, row counts and hashes.
 
 ## API
 - Base: `https://data.elexon.co.uk/bmrs/api/v1/datasets/<DATASET>/stream`. No API key needed, none stored.
@@ -37,3 +37,9 @@ Default: the hourly value at T is applied to both half-hours it covers (T:00 and
 ## Still to verify before the build is final
 - Gate closure time: EPEX GB day-ahead (10:20 CET, 09:20 UK) and Nord Pool N2EX (09:50 GMT) per the build prompt. Confirm against current exchange documentation and link it in the README.
 - Curtailment and farm coverage differences between FUELHH and WINDFOR cannot be separated with the allowed data. Stated as a caveat only.
+
+## Added after the build
+- `scripts/fetch_data.py` pulls weekly windows and reproduced the first manual pull exactly (same row hashes), so the snapshot is repeatable.
+- For every half-hour of the delivery days there is a WINDFOR row published after that half-hour began (the vintages include past hours). The hindsight series therefore behaves like a backcast, and it improves MAE by 374 MW at the 09:20 cutoff. It is shown only as a warning about hindsight.
+- Three FUELHH rows (15 Jan, 10:00 to 11:00 UTC) were published at 12:25 and 12:26. They are flagged and metrics are shown with and without them (MAE 2,042 MW and 2,043 MW).
+- Gate closure sources, read 27 Oct 2026: EPEX moved the GB day-ahead auction from 11:00 GMT to 09:20 GMT from 1 Jan 2021 (https://epexspot.com/en/news/exchange-council-welcomes-new-timing-gb-day-ahead-auction). Nord Pool states gate closure 09:50 GMT (https://support.nordpoolgroup.com/support/solutions/articles/8000088463-about-the-day-ahead-gb-auction).

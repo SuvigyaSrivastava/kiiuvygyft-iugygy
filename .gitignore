@@ -8,3 +8,6 @@ frontend/dist/
 .env
 .vercel/
 .venv/
+.agents/
+.claude/
+skills-lock.json
