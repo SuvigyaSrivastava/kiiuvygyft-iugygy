@@ -41,7 +41,7 @@ function timeAxis(t: Tokens, extra: Record<string, unknown> = {}) {
 
 const ms = (iso: string) => Date.parse(iso);
 
-export function decisionChart(t: Tokens, pts: DecisionPoint[], opts: { showActual: boolean; showHindsight: boolean }): ChartOption {
+export function decisionChart(t: Tokens, pts: DecisionPoint[], opts: { showActual: boolean; showHindsight: boolean; lowWindow?: { start: string; end: string } | null }): ChartOption {
   const hasBand = pts.some((p) => p.band_low_mw != null);
   const series: Record<string, unknown>[] = [];
   if (hasBand) {
@@ -50,7 +50,10 @@ export function decisionChart(t: Tokens, pts: DecisionPoint[], opts: { showActua
       { name: "P10 to P90 range", type: "line", stack: "band", symbol: "none", lineStyle: { opacity: 0 }, areaStyle: { color: t.forecast, opacity: 0.2 }, data: pts.map((p) => [ms(p.t), (p.band_high_mw ?? 0) - (p.band_low_mw ?? 0)]), silent: true },
     );
   }
-  series.push({ name: "Forecast at cutoff", type: "line", symbol: "none", step: "start", lineStyle: { color: t.forecast, width: 2 }, itemStyle: { color: t.forecast }, data: pts.map((p) => [ms(p.t), p.forecast_mw]) });
+  const low = opts.lowWindow
+    ? { silent: true, itemStyle: { color: t.forecast, opacity: 0.07 }, label: { show: true, position: "insideTop", color: t.muted, fontSize: 12, formatter: "Lowest three hours" }, data: [[{ xAxis: ms(opts.lowWindow.start) }, { xAxis: ms(opts.lowWindow.end) }]] }
+    : undefined;
+  series.push({ name: "Forecast at cutoff", type: "line", symbol: "none", step: "start", lineStyle: { color: t.forecast, width: 2 }, itemStyle: { color: t.forecast }, markArea: low, data: pts.map((p) => [ms(p.t), p.forecast_mw]) });
   if (opts.showHindsight) {
     series.push({ name: "Latest forecast ever published (hindsight)", type: "line", symbol: "none", step: "start", lineStyle: { color: t.actual, width: 2, type: "dashed" }, itemStyle: { color: t.actual }, data: pts.map((p) => [ms(p.t), p.hindsight_forecast_mw]) });
   }
@@ -58,8 +61,12 @@ export function decisionChart(t: Tokens, pts: DecisionPoint[], opts: { showActua
     series.push({ name: "Actual wind (hindsight)", type: "line", symbol: "none", lineStyle: { color: t.actual, width: 2 }, itemStyle: { color: t.actual }, data: pts.map((p) => [ms(p.t), p.actual_mw]) });
   }
   const b = base(t);
+  const calm = typeof window !== "undefined" && typeof window.matchMedia === "function" && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   return {
     ...b,
+    animation: !calm,
+    animationDuration: 700,
+    animationEasing: "cubicOut",
     legend: { ...b.legend, data: ["Forecast at cutoff", ...(hasBand ? [{ name: "P10 to P90 range", icon: "rect", itemStyle: { color: t.forecast, opacity: 0.45 } }] : []), ...(opts.showHindsight ? ["Latest forecast ever published (hindsight)"] : []), ...(opts.showActual ? ["Actual wind (hindsight)"] : [])] },
     tooltip: {
       ...b.tooltip,

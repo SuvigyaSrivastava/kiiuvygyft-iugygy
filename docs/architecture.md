@@ -2,7 +2,7 @@
 
 ```
   Browser (React, TanStack Query, ECharts)
-        |  GET /api/decision, /accuracy, /sensitivity, /quality, /calibration, /receipt
+        |  GET /api/decision, /month, /accuracy, /sensitivity, /quality, /calibration, /receipt
         v
   FastAPI  main.py          validates inputs, returns Pydantic models, clean 4xx errors
         |

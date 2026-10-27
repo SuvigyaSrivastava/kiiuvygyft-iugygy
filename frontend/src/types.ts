@@ -126,3 +126,6 @@ export interface CalibrationResp {
   chosen: CoverBacktest;
   finding: string;
 }
+
+export interface MonthDay { delivery_day: string; mean_gw: number | null; min_gw: number | null; max_gw: number | null; forecast_issued: string | null }
+export interface Month { scope: Scope; selection: string; days: MonthDay[] }

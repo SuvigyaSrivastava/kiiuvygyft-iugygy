@@ -357,3 +357,24 @@ def day_range(engine: Engine) -> str:
 
 def tomorrow(day: date) -> date:
     return day + timedelta(days=1)
+
+
+def month(engine: Engine, spec: Spec, scope: Scope) -> m.MonthResponse:
+    """Forecast only, one row per delivery day. Actuals are never read here, so nothing leaks into the picker."""
+    days = []
+    for d in engine.scope_days(scope):
+        sel = engine.select_day(d, spec)
+        if sel.empty:
+            days.append(m.MonthDay(delivery_day=d, mean_gw=None, min_gw=None, max_gw=None, forecast_issued=None))
+            continue
+        fc = sel["forecast"]
+        days.append(
+            m.MonthDay(
+                delivery_day=d,
+                mean_gw=float(fc.mean() / 1000),
+                min_gw=float(fc.min() / 1000),
+                max_gw=float(fc.max() / 1000),
+                forecast_issued=sel["publishTime"].max().to_pydatetime(),
+            )
+        )
+    return m.MonthResponse(scope=scope, selection=spec.label(), days=days)

@@ -1,6 +1,8 @@
 import { type Controls, isCutoff, targetQuantile } from "../controls";
 import { fmtDay, fmtPct } from "../format";
+import { useMonth } from "../api";
 import type { Meta } from "../types";
+import { MonthStrip } from "./MonthStrip";
 
 interface Props {
   c: Controls;
@@ -32,6 +34,17 @@ export function DayPicker({ c, set, meta }: Props) {
         &rsaquo;
       </button>
     </div>
+  );
+}
+
+/** Day stepper plus the month at a glance. */
+export function DayHeader(p: Props) {
+  const month = useMonth(p.c);
+  return (
+    <>
+      <DayPicker {...p} />
+      <MonthStrip month={month.data} selected={p.c.day} onPick={(day) => p.set({ day })} />
+    </>
   );
 }
 

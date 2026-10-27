@@ -1,10 +1,12 @@
-import { useDecision } from "../api";
+import { useEffect, useMemo, useState } from "react";
+import { receiptUrl, useDecision, useMonth, useReceiptHeader } from "../api";
 import { Chart } from "../components/Chart";
 import { Timeline } from "../components/Timeline";
-import { Disclosure, ErrorBlock, Loading, Stat } from "../components/ui";
+import { Disclosure, ErrorBlock, Stat } from "../components/ui";
 import { coverChart, decisionChart } from "../charts";
 import type { Controls } from "../controls";
-import { fmtDay, fmtGW, fmtGWFromGW, fmtInt, fmtMW, fmtMWh, fmtPct, fmtStamp, fmtTime, previousDay } from "../format";
+import { fmtDay, fmtGW, fmtGWFromGW, fmtInt, fmtMW, fmtMWh, fmtPct, fmtStamp, fmtTime, previousDay, summaryText } from "../format";
+import type { Decision } from "../types";
 import type { Tokens } from "../theme";
 
 interface Props {
@@ -13,9 +15,92 @@ interface Props {
   tokens: Tokens;
 }
 
+function Skeleton() {
+  return (
+    <div className="skel" role="status" aria-label="Loading the forecast">
+      <div className="skel-h" />
+      <div className="skel-p" />
+      <div className="skel-row"><i /><i /><i /></div>
+      <div className="skel-chart" />
+    </div>
+  );
+}
+
+function DayChart({ d, c, tokens }: { d: Decision; c: Controls; tokens: Tokens }) {
+  const win = d.summary.low_wind_window;
+  const option = useMemo(
+    () => decisionChart(tokens, d.points, { showActual: c.hindsight, showHindsight: c.hindsight, lowWindow: win ? { start: win.start, end: win.end } : null }),
+    [tokens, d.points, c.hindsight, win],
+  );
+  return <Chart option={option} height={340} label={`Wind forecast for ${fmtDay(d.delivery_day)} in megawatts, half-hourly`} />;
+}
+
+function CoverChart({ d, tokens }: { d: Decision; tokens: Tokens }) {
+  const option = useMemo(() => coverChart(tokens, d.points), [tokens, d.points]);
+  return <Chart option={option} height={210} label="Suggested extra cover in megawatts, half-hourly" />;
+}
+
+function CopyButton({ label, text }: { label: string; text: () => string }) {
+  const [done, setDone] = useState(false);
+  useEffect(() => {
+    if (!done) return;
+    const t = setTimeout(() => setDone(false), 1800);
+    return () => clearTimeout(t);
+  }, [done]);
+  const run = async () => {
+    try {
+      await navigator.clipboard.writeText(text());
+      setDone(true);
+    } catch {
+      window.prompt("Copy this text", text());
+    }
+  };
+  return (
+    <button type="button" className="ghost" onClick={run}>
+      {done ? "Copied" : label}
+    </button>
+  );
+}
+
+function ReceiptRow({ c }: { c: Controls }) {
+  const r = useReceiptHeader(c);
+  if (r.isPending) return <p className="hint">Preparing the receipt...</p>;
+  if (r.isError) return <p className="hint">The receipt could not be built for this day.</p>;
+  return (
+    <>
+      <p className="prose">A fingerprint of the exact forecast rows behind this decision. Run <code>scripts/verify_receipt.py</code> against the raw data to check it.</p>
+      <dl className="kv">
+        <dt>Rows</dt><dd>{r.data.row_count}</dd>
+        <dt>SHA-256</dt><dd><code>{r.data.input_rows_sha256}</code></dd>
+        <dt>Snapshot</dt><dd><code>{r.data.snapshot_id}</code></dd>
+      </dl>
+      <p className="row">
+        <a className="btn" href={receiptUrl(c, "json")} download>Download JSON</a>
+        <a className="btn" href={receiptUrl(c, "csv")} download>Download CSV</a>
+      </p>
+    </>
+  );
+}
+
 export function DecisionView({ c, set, tokens }: Props) {
   const q = useDecision(c);
-  if (q.isPending) return <Loading what="the forecast" />;
+  const month = useMonth(c);
+  const dayList = month.data?.days.map((x) => x.delivery_day) ?? [];
+  const idx = dayList.indexOf(c.day);
+
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      const el = e.target as HTMLElement | null;
+      if (el && /^(INPUT|SELECT|TEXTAREA)$/.test(el.tagName)) return;
+      if (e.altKey || e.ctrlKey || e.metaKey) return;
+      if (e.key === "ArrowLeft" && idx > 0) set({ day: dayList[idx - 1] });
+      if (e.key === "ArrowRight" && idx >= 0 && idx < dayList.length - 1) set({ day: dayList[idx + 1] });
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [idx, dayList, set]);
+
+  if (q.isPending) return <Skeleton />;
   if (q.isError) return <ErrorBlock error={q.error} onRetry={() => q.refetch()} />;
   const d = q.data;
   const s = d.summary;
@@ -38,6 +123,21 @@ export function DecisionView({ c, set, tokens }: Props) {
             </>
           )}
         </p>
+        <div className="actions">
+          <CopyButton
+            label="Copy summary"
+            text={() =>
+              summaryText({
+                day: d.delivery_day, meanGw: s.mean_gw, minGw: s.min_gw, maxGw: s.max_gw,
+                lowStart: s.low_wind_window?.start, lowEnd: s.low_wind_window?.end, lowMw: s.low_wind_window?.mean_mw,
+                coverMwh: s.total_cover_mwh, quantile: d.target_quantile,
+                issued: d.vintages[0]?.publish_time ?? d.decision_timestamp,
+                cutoff: leadMode ? undefined : fmtTime(d.decision_timestamp), lead: leadMode ? c.lead : undefined,
+              })
+            }
+          />
+          <CopyButton label="Copy link" text={() => window.location.href} />
+        </div>
       </header>
 
       <dl className="stats">
@@ -55,7 +155,7 @@ export function DecisionView({ c, set, tokens }: Props) {
       </dl>
 
       <figure className="plot">
-        <Chart option={decisionChart(tokens, d.points, { showActual: c.hindsight, showHindsight: c.hindsight })} height={340} label={`Wind forecast for ${fmtDay(d.delivery_day)} in megawatts, half-hourly`} />
+        <DayChart d={d} c={c} tokens={tokens} />
         <figcaption>
           {hasBand
             ? `The shaded range is where actual wind has usually landed, from errors on ${d.history_days} earlier days.`
@@ -72,7 +172,7 @@ export function DecisionView({ c, set, tokens }: Props) {
       <div className="discs">
         {hasBand && (
           <Disclosure title="Extra cover by half-hour">
-            <Chart option={coverChart(tokens, d.points)} height={210} label="Suggested extra cover in megawatts, half-hourly" />
+            <CoverChart d={d} tokens={tokens} />
           </Disclosure>
         )}
 
@@ -106,6 +206,10 @@ export function DecisionView({ c, set, tokens }: Props) {
           <p className="hint">
             {d.remaining_need_mw != null ? `Left for thermal plants: ${fmtMW(d.remaining_need_mw)} on average, after the forecast and the extra cover. Illustrative, from your figure.` : "Enter a figure to see what is left for thermal plants. It is your number, not data."}
           </p>
+        </Disclosure>
+
+        <Disclosure title="Decision receipt" note="for audit">
+          <ReceiptRow c={c} />
         </Disclosure>
 
         <Disclosure title="Half-hour table">

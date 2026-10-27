@@ -261,3 +261,17 @@ class CalibrationResponse(BaseModel):
     cover_curve: list[CoverBacktest]
     chosen: CoverBacktest
     finding: str
+
+
+class MonthDay(BaseModel):
+    delivery_day: date
+    mean_gw: float | None
+    min_gw: float | None
+    max_gw: float | None
+    forecast_issued: datetime | None
+
+
+class MonthResponse(BaseModel):
+    scope: str
+    selection: str
+    days: list[MonthDay]

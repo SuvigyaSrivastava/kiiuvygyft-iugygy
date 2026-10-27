@@ -88,14 +88,14 @@ input.narrow { width: 76px; }
 .check { display: flex; align-items: center; gap: 8px; font-size: 14px; }
 .check input { width: 16px; height: 16px; accent-color: var(--accent); }
 
-.daypicker { display: flex; align-items: center; gap: 4px; margin: 26px 0 4px; }
+.daypicker { display: flex; align-items: center; gap: 4px; margin: 18px 0 4px; }
 .step { font: inherit; font-size: 22px; line-height: 1; width: 40px; height: 40px; border-radius: 999px; border: 1px solid var(--grid); background: var(--surface); color: var(--ink); cursor: pointer; }
 .step:hover:not(:disabled) { border-color: var(--ink-2); }
 .step:disabled { color: var(--axis); cursor: not-allowed; }
 .day-select select { border: 0; background: transparent; font-size: 17px; font-weight: 600; min-height: 40px; padding: 0 8px; cursor: pointer; }
 .day-select select:hover { background: var(--accent-wash); }
 
-.settings { margin: 0 0 4px; }
+.settings { margin: 14px 0 0; }
 .settings > summary, .disc > summary { list-style: none; cursor: pointer; display: flex; align-items: baseline; gap: 12px; padding: 10px 0; color: var(--ink-2); font-size: 14px; }
 .settings > summary::-webkit-details-marker, .disc > summary::-webkit-details-marker { display: none; }
 .settings > summary::before, .disc > summary::before { content: ""; width: 7px; height: 7px; border-right: 1.5px solid currentColor; border-bottom: 1.5px solid currentColor; transform: rotate(-45deg) translateY(-1px); transition: transform 0.15s; flex: none; align-self: center; }
@@ -177,3 +177,29 @@ ul.plain li { margin-bottom: 5px; }
   .two-up { grid-template-columns: 1fr; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* month strip */
+.strip-wrap { margin: 6px 0 4px; }
+.strip { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: 3px; height: 56px; align-items: end; }
+.strip-empty { height: 56px; }
+.bar { all: unset; box-sizing: border-box; display: flex; align-items: flex-end; height: 100%; cursor: pointer; border-radius: 3px; position: relative; }
+.bar span { display: block; width: 100%; background: var(--axis); border-radius: 3px 3px 1px 1px; transition: background 0.12s; }
+.bar:hover span { background: var(--muted); }
+.bar.on span { background: var(--accent); }
+.bar:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.strip-axis { display: flex; justify-content: space-between; margin-top: 6px; font-size: 12px; color: var(--muted); }
+
+.actions { display: flex; gap: 6px; margin: 4px 0 0 -8px; }
+.ghost { font: inherit; font-size: 13px; color: var(--ink-2); background: none; border: 0; border-radius: 6px; padding: 5px 8px; cursor: pointer; }
+.ghost:hover { color: var(--ink); background: var(--accent-wash); }
+
+/* loading skeleton */
+.skel { padding-top: 24px; }
+.skel > div, .skel-row i { background: var(--grid); border-radius: 8px; animation: pulse 1.4s ease-in-out infinite; }
+.skel-h { height: 84px; width: min(520px, 90%); margin-bottom: 14px; }
+.skel-p { height: 18px; width: min(420px, 80%); margin-bottom: 30px; }
+.skel-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; margin-bottom: 30px; background: none !important; animation: none !important; }
+.skel-row i { display: block; height: 44px; }
+.skel-chart { height: 300px; }
+@keyframes pulse { 50% { opacity: 0.5; } }
+@media (prefers-reduced-motion: reduce) { .skel > div, .skel-row i { animation: none; } }

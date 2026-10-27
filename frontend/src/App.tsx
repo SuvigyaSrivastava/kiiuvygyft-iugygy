@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMeta } from "./api";
-import { DayPicker, SettingsPanel } from "./components/ControlBar";
+import { DayHeader, SettingsPanel } from "./components/ControlBar";
 import { type Controls, VIEWS, type View, fromSearch, toSearch } from "./controls";
 import { fmtUtcStamp } from "./format";
 import { useTheme } from "./theme";
@@ -72,7 +72,7 @@ export default function App() {
         ))}
       </div>
 
-      {c.view === "decision" && <DayPicker c={c} set={set} meta={m} />}
+      {c.view === "decision" && <DayHeader c={c} set={set} meta={m} />}
       <SettingsPanel c={c} set={set} meta={m} />
 
       <main id="main" role="tabpanel" aria-labelledby={`tab-${c.view}`} tabIndex={-1}>

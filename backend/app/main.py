@@ -110,6 +110,11 @@ def decision(
     )
 
 
+@app.get("/api/month", response_model=m.MonthResponse)
+def month(engine: EngineDep, spec: SpecDep, scope: ScopeQ = "decision_in_january") -> m.MonthResponse:
+    return views.month(engine, spec, scope)
+
+
 @app.get("/api/accuracy", response_model=m.AccuracyResponse)
 def accuracy(engine: EngineDep, spec: SpecDep, scope: ScopeQ = "decision_in_january") -> m.AccuracyResponse:
     return views.accuracy(engine, spec, scope)

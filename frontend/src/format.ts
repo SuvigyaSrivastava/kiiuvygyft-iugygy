@@ -63,3 +63,15 @@ export function previousDay(iso: string): string {
   d.setUTCDate(d.getUTCDate() - 1);
   return d.toISOString().slice(0, 10);
 }
+
+/** Plain-text decision summary for pasting into a chat or an email. */
+export function summaryText(o: {
+  day: string; meanGw: number; minGw: number; maxGw: number; lowStart?: string; lowEnd?: string; lowMw?: number;
+  coverMwh: number | null; quantile: number; issued: string; cutoff?: string; lead?: number;
+}): string {
+  const parts = [`${fmtDay(o.day)}: plan for ${fmtGWFromGW(o.meanGw)} of wind, ranging ${fmtGWFromGW(o.minGw)} to ${fmtGWFromGW(o.maxGw)}.`];
+  if (o.lowStart && o.lowEnd && o.lowMw != null) parts.push(`Lowest three hours ${fmtTime(o.lowStart)} to ${fmtTime(o.lowEnd)}, averaging ${fmtGW(o.lowMw)}.`);
+  if (o.coverMwh != null) parts.push(`Extra cover ${fmtMWh(o.coverMwh)}, enough in ${fmtPct(o.quantile, 0)} of half-hours.`);
+  parts.push(o.lead != null ? `Each half-hour uses the latest forecast issued at least ${o.lead} hours before it.` : `Forecast issued ${fmtStamp(o.issued)}, latest before the ${o.cutoff} London cutoff.`);
+  return parts.join(" ");
+}

@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { fmtDay, fmtGW, fmtMW, fmtMWh, fmtPct, fmtRatio, fmtStamp, fmtTime, previousDay } from "./format";
+import { fmtDay, fmtGW, fmtMW, fmtMWh, fmtPct, fmtRatio, fmtStamp, fmtTime, previousDay, summaryText } from "./format";
 
 describe("format", () => {
   it("formats megawatts with separators and explicit sign when asked", () => {
@@ -34,5 +34,15 @@ describe("format", () => {
   it("steps back one calendar day", () => {
     expect(previousDay("2026-01-01")).toBe("2025-12-31");
     expect(previousDay("2026-03-01")).toBe("2026-02-28");
+  });
+});
+
+describe("summaryText", () => {
+  it("reads as plain sentences with units and no dashes", () => {
+    const t = summaryText({ day: "2026-01-15", meanGw: 11.6, minGw: 8.9, maxGw: 15.8, lowStart: "2026-01-15T16:00:00Z", lowEnd: "2026-01-15T19:00:00Z", lowMw: 8900, coverMwh: 41118, quantile: 0.75, issued: "2026-01-14T07:30:00Z", cutoff: "09:20" });
+    expect(t).toContain("plan for 11.6 GW of wind");
+    expect(t).toContain("Extra cover 41,118 MWh, enough in 75% of half-hours.");
+    expect(t).toContain("09:20 London cutoff");
+    expect(t).not.toMatch(/[—–]/);
   });
 });

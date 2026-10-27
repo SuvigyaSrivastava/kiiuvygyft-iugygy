@@ -129,3 +129,13 @@ def test_pyproject_dependencies_match_requirements():
     declared = tomllib.loads((root / "pyproject.toml").read_text())["project"]["dependencies"]
     pinned = [ln.strip() for ln in (root / "requirements.txt").read_text().splitlines() if ln.strip() and not ln.startswith("#")]
     assert sorted(declared) == sorted(pinned)
+
+
+def test_month_overview_is_forecast_only_and_matches_decision(client):
+    body = client.get("/api/month", params={"cutoff": "09:20"}).json()
+    assert [d["delivery_day"] for d in body["days"]][0] == "2026-01-02"
+    day = next(d for d in body["days"] if d["delivery_day"] == "2026-01-10")
+    dec = client.get("/api/decision", params={"delivery_day": "2026-01-10", "cutoff": "09:20"}).json()
+    assert day["mean_gw"] == pytest.approx(dec["summary"]["mean_gw"])
+    assert day["forecast_issued"] <= "2026-01-09T09:20:00Z"
+    assert set(day) == {"delivery_day", "mean_gw", "min_gw", "max_gw", "forecast_issued"}  # no actuals, no errors

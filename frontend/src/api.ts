@@ -1,6 +1,6 @@
 import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { type Controls, selectionParams } from "./controls";
-import type { Accuracy, CalibrationResp, Decision, Meta, Quality, Sensitivity } from "./types";
+import type { Accuracy, CalibrationResp, Decision, Meta, Month, Quality, Sensitivity } from "./types";
 
 const BASE: string = (import.meta.env.VITE_API_BASE as string | undefined) ?? "";
 
@@ -79,3 +79,10 @@ export const useReceiptHeader = (c: Controls) =>
 export function receiptUrl(c: Controls, format: "json" | "csv"): string {
   return apiUrl("/api/receipt", { delivery_day: c.day, ...selectionParams(c), format });
 }
+
+export const useMonth = (c: Controls) =>
+  useQuery({
+    queryKey: ["month", c.scope, c.mode, c.cutoff, c.lead, c.interp],
+    queryFn: ({ signal }) => get<Month>("/api/month", { scope: c.scope, ...selectionParams(c) }, signal),
+    ...keep,
+  });
