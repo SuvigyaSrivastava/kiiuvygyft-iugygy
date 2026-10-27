@@ -118,3 +118,14 @@ def test_vercel_entry_point_exposes_the_same_app():
     from api.index import app as vercel_app
 
     assert vercel_app is app
+
+
+def test_pyproject_dependencies_match_requirements():
+    """Vercel installs from pyproject.toml, Docker from requirements.txt. They must not drift."""
+    import tomllib
+    from pathlib import Path
+
+    root = Path(__file__).resolve().parents[1]
+    declared = tomllib.loads((root / "pyproject.toml").read_text())["project"]["dependencies"]
+    pinned = [ln.strip() for ln in (root / "requirements.txt").read_text().splitlines() if ln.strip() and not ln.startswith("#")]
+    assert sorted(declared) == sorted(pinned)
