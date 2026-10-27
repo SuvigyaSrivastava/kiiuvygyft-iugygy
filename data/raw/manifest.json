@@ -1,0 +1,33 @@
+{
+  "snapshot_id": "20dffcec0e0f",
+  "fetched_at_utc": "2026-10-27T14:29:40Z",
+  "api_base": "https://data.elexon.co.uk/bmrs/api/v1/datasets",
+  "files": {
+    "fuelhh_wind": {
+      "path": "data/raw/fuelhh_wind.json.gz",
+      "rows": 1536,
+      "kept_filter": "startTime in [2026-01-01, 2026-02-02)",
+      "sha256_canonical_rows": "212091d6cf0fa93a4187fa7970b820fbde947960816631d8b17f71ce141decb1",
+      "source_urls": [
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?publishDateTimeFrom=2025-12-31T00%3A00%3A00Z&publishDateTimeTo=2026-01-07T00%3A00%3A00Z&fuelType=WIND",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?publishDateTimeFrom=2026-01-07T00%3A00%3A00Z&publishDateTimeTo=2026-01-14T00%3A00%3A00Z&fuelType=WIND",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?publishDateTimeFrom=2026-01-14T00%3A00%3A00Z&publishDateTimeTo=2026-01-21T00%3A00%3A00Z&fuelType=WIND",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?publishDateTimeFrom=2026-01-21T00%3A00%3A00Z&publishDateTimeTo=2026-01-28T00%3A00%3A00Z&fuelType=WIND",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/FUELHH/stream?publishDateTimeFrom=2026-01-28T00%3A00%3A00Z&publishDateTimeTo=2026-02-03T00%3A00%3A00Z&fuelType=WIND"
+      ]
+    },
+    "windfor": {
+      "path": "data/raw/windfor.json.gz",
+      "rows": 19856,
+      "kept_filter": "publishTime in [2025-12-30, 2026-02-02)",
+      "sha256_canonical_rows": "6b1c4ea171128a070b2ab6ff67e666596026ed47b9e70858081e18162a8ff48b",
+      "source_urls": [
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=2025-12-30T00%3A00%3A00Z&publishDateTimeTo=2026-01-06T00%3A00%3A00Z",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=2026-01-06T00%3A00%3A00Z&publishDateTimeTo=2026-01-13T00%3A00%3A00Z",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=2026-01-13T00%3A00%3A00Z&publishDateTimeTo=2026-01-20T00%3A00%3A00Z",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=2026-01-20T00%3A00%3A00Z&publishDateTimeTo=2026-01-27T00%3A00%3A00Z",
+        "https://data.elexon.co.uk/bmrs/api/v1/datasets/WINDFOR/stream?publishDateTimeFrom=2026-01-27T00%3A00%3A00Z&publishDateTimeTo=2026-02-02T00%3A00%3A00Z"
+      ]
+    }
+  }
+}
