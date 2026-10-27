@@ -4,8 +4,8 @@ export type ThemeChoice = "system" | "light" | "dark";
 
 /** Chart tokens. Values mirror the CSS custom properties in styles.css; keep both in step. */
 export const TOKENS = {
-  light: { surface: "#fcfcfb", ink: "#0b0b0b", ink2: "#52514e", muted: "#898781", grid: "#e1e0d9", axis: "#c3c2b7", forecast: "#2a78d6", actual: "#eb6834", over: "#e34948", under: "#2a78d6", good: "#006300" },
-  dark: { surface: "#1a1a19", ink: "#f0efec", ink2: "#c3c2b7", muted: "#898781", grid: "#2c2c2a", axis: "#383835", forecast: "#3987e5", actual: "#d95926", over: "#e66767", under: "#3987e5", good: "#0ca30c" },
+  light: { surface: "#ffffff", ink: "#111418", ink2: "#4a5058", muted: "#6a7078", grid: "#e7e9ec", axis: "#cfd3d8", forecast: "#2a78d6", actual: "#eb6834", over: "#e34948", under: "#2a78d6", good: "#006300" },
+  dark: { surface: "#14171c", ink: "#f2f4f7", ink2: "#c4c9d0", muted: "#9aa1ab", grid: "#242830", axis: "#343943", forecast: "#3987e5", actual: "#d95926", over: "#e66767", under: "#3987e5", good: "#0ca30c" },
 } as const;
 export type Tokens = { [K in keyof typeof TOKENS.light]: string };
 

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { useMeta } from "./api";
-import { ControlBar } from "./components/ControlBar";
+import { DayPicker, SettingsPanel } from "./components/ControlBar";
 import { type Controls, VIEWS, type View, fromSearch, toSearch } from "./controls";
 import { fmtUtcStamp } from "./format";
 import { useTheme } from "./theme";
@@ -47,12 +47,10 @@ export default function App() {
           <span className="mark" aria-hidden="true" />
           <span className="brand-name">GB day-ahead wind</span>
         </div>
-        <button type="button" className="btn" onClick={theme.cycle} aria-label={`${themeLabel}. Activate to change.`}>
-          {themeLabel}
+        <button type="button" className="theme" onClick={theme.cycle} aria-label={`${themeLabel}. Activate to change.`}>
+          {theme.choice === "system" ? "Auto" : theme.choice === "light" ? "Light" : "Dark"}
         </button>
       </header>
-
-      <ControlBar c={c} set={set} meta={m} />
 
       <div className="tabs" role="tablist" aria-label="Views">
         {VIEWS.map((v: { id: View; label: string }, i) => (
@@ -73,6 +71,9 @@ export default function App() {
           </button>
         ))}
       </div>
+
+      {c.view === "decision" && <DayPicker c={c} set={set} meta={m} />}
+      <SettingsPanel c={c} set={set} meta={m} />
 
       <main id="main" role="tabpanel" aria-labelledby={`tab-${c.view}`} tabIndex={-1}>
         {meta.isError ? (

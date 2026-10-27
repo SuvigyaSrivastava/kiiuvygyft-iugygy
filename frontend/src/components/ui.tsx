@@ -44,6 +44,18 @@ export function Section({ title, hint, children, id }: { title: string; hint?: R
   );
 }
 
+export function Disclosure({ title, note, children }: { title: string; note?: ReactNode; children: ReactNode }) {
+  return (
+    <details className="disc">
+      <summary>
+        <span>{title}</span>
+        {note && <span className="sum">{note}</span>}
+      </summary>
+      <div className="disc-body">{children}</div>
+    </details>
+  );
+}
+
 export function TableView({ summary, children }: { summary: string; children: ReactNode }) {
   return (
     <details className="table-view">

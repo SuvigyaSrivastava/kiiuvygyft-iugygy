@@ -40,9 +40,8 @@ describe("App", () => {
   it("opens on the decision with real numbers from the API", async () => {
     mockApi();
     renderApp();
-    expect(await screen.findByRole("heading", { level: 1, name: /Wind to plan around for Thu 15 Jan 2026/ })).toBeInTheDocument();
-    expect(screen.getByText("11.6 GW")).toBeInTheDocument();
-    expect(screen.getByText(/issued Wed 14 Jan 07:30/)).toBeInTheDocument();
+    expect(await screen.findByRole("heading", { level: 1, name: /Plan for 11\.6 GW of wind on Thu 15 Jan 2026/ })).toBeInTheDocument();
+        expect(screen.getAllByText(/issued Wed 14 Jan 07:30/)[0]).toBeInTheDocument();
     expect(screen.getByRole("tab", { name: "Decision", selected: true })).toBeInTheDocument();
   });
 
